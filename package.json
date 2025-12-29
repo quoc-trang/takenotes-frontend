@@ -1,0 +1,30 @@
+{
+  "name": "takenotes-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest",
+    "@nuxtjs/tailwindcss": "^6.10.1",
+    "@types/node": "^20.10.5",
+    "nuxt": "^3.8.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@nuxthub/core": "^0.9.0",
+    "@pinia/nuxt": "^0.5.1",
+    "@tiptap/starter-kit": "^3.13.0",
+    "@tiptap/vue-3": "^3.13.0",
+    "@tiptap/extension-image": "^3.13.0",
+    "@tiptap/extension-underline": "^3.13.0",
+    "jwt-decode": "^4.0.0",
+    "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^3.2.3"
+  }
+}
