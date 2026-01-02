@@ -3,7 +3,6 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
-    '@nuxthub/core'
   ],
   css: ['~/assets/css/main.css'],
   runtimeConfig: {
