@@ -2,32 +2,61 @@
   <div class="flex h-screen bg-white font-sans">
     <!-- Sidebar -->
     <aside v-if="authStore.isLoggedIn" class="notion-sidebar">
-      <NuxtLink to="/notes" class="text-2xl font-bold mb-8 px-2 text-gray-900">TakeNotes</NuxtLink>
+      <NuxtLink to="/notes" class="text-2xl font-bold mb-8 px-2 text-gray-900"
+        >TakeNotes</NuxtLink
+      >
       <nav class="flex-1 flex flex-col gap-1">
-        <NuxtLink to="/notes" class="notion-sidebar-link">All Notes</NuxtLink>
-        <NuxtLink to="/notes/new" class="notion-sidebar-link">New Note</NuxtLink>
+        <NuxtLink
+          to="/notes"
+          :class="[
+            'notion-sidebar-link',
+            { 'notion-sidebar-link-active': isAllNotesActive },
+          ]"
+          >All Notes</NuxtLink
+        >
+        <NuxtLink
+          to="/notes/new"
+          :class="[
+            'notion-sidebar-link',
+            { 'notion-sidebar-link-active': isNewNoteActive },
+          ]"
+          >New Note</NuxtLink
+        >
       </nav>
       <div class="mt-auto pt-8 border-t border-gray-200">
-        <button @click="logout" class="notion-sidebar-link w-full text-left">Logout</button>
+        <button @click="logout" class="notion-sidebar-link w-full text-left">
+          Logout
+        </button>
       </div>
     </aside>
 
     <!-- Main content -->
     <div class="flex flex-col min-h-screen flex-1 overflow-y-scroll">
       <!-- Token expiration warning -->
-      <div v-if="showExpirationWarning" class="bg-yellow-50 border-b border-yellow-200">
+      <div
+        v-if="showExpirationWarning"
+        class="bg-yellow-50 border-b border-yellow-200"
+      >
         <div class="max-w-3xl mx-auto px-4 py-2">
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <svg class="w-5 h-5 text-yellow-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              <svg
+                class="w-5 h-5 text-yellow-400 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clip-rule="evenodd"
+                />
               </svg>
               <span class="text-sm text-yellow-800">
                 Your session will expire in {{ timeUntilExpiration }}
               </span>
             </div>
-            <button 
-              @click="handleRefreshToken" 
+            <button
+              @click="handleRefreshToken"
               class="text-sm text-yellow-800 hover:text-yellow-900 underline"
               :disabled="refreshing"
             >
@@ -46,49 +75,63 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
+import { useAuthStore } from '~/stores/auth';
 
-const authStore = useAuthStore()
-const router = useRouter()
-const { isTokenExpiringSoon, getTimeUntilExpiration, refreshToken } = useTokenExpiration()
+const authStore = useAuthStore();
+const router = useRouter();
+const route = useRoute();
+const { isTokenExpiringSoon, getTimeUntilExpiration, refreshToken } =
+  useTokenExpiration();
 
-const refreshing = ref(false)
-const timeUntilExpiration = ref('')
+const refreshing = ref(false);
+const timeUntilExpiration = ref('');
 
 // Computed property to show expiration warning
 const showExpirationWarning = computed(() => {
-  return authStore.isLoggedIn && isTokenExpiringSoon()
-})
+  return authStore.isLoggedIn && isTokenExpiringSoon();
+});
+
+const isAllNotesActive = computed(() => {
+  const path = route.path;
+  return (
+    path === '/notes' || (path.startsWith('/notes/') && path !== '/notes/new')
+  );
+});
+
+const isNewNoteActive = computed(() => {
+  const path = route.path;
+  return path === '/notes/new';
+});
 
 // Update time until expiration every minute
 const updateExpirationTime = () => {
   if (authStore.isLoggedIn) {
-    timeUntilExpiration.value = getTimeUntilExpiration()
+    timeUntilExpiration.value = getTimeUntilExpiration();
   }
-}
+};
 
 // Handle token refresh
 const handleRefreshToken = async () => {
-  refreshing.value = true
+  refreshing.value = true;
   try {
-    const success = await refreshToken()
+    const success = await refreshToken();
     if (success) {
-      timeUntilExpiration.value = getTimeUntilExpiration()
+      timeUntilExpiration.value = getTimeUntilExpiration();
     }
   } finally {
-    refreshing.value = false
+    refreshing.value = false;
   }
-}
+};
 
 // Set up timer to update expiration time
 onMounted(() => {
-  updateExpirationTime()
-  const interval = setInterval(updateExpirationTime, 60000) // Update every minute
-  
+  updateExpirationTime();
+  const interval = setInterval(updateExpirationTime, 60000); // Update every minute
+
   onUnmounted(() => {
-    clearInterval(interval)
-  })
-})
+    clearInterval(interval);
+  });
+});
 
 const logout = async () => {
   try {
@@ -97,17 +140,17 @@ const logout = async () => {
       await $fetch('/api/auth/logout', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${authStore.token}`
-        }
-      })
+          Authorization: `Bearer ${authStore.token}`,
+        },
+      });
     }
   } catch (error) {
     // Ignore logout errors, still clear local state
-    console.error('Logout error:', error)
+    console.error('Logout error:', error);
   } finally {
     // Always clear local auth state
-    authStore.logout()
-    router.push('/login')
+    authStore.logout();
+    router.push('/login');
   }
-}
-</script> 
+};
+</script>

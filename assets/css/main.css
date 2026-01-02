@@ -44,4 +44,7 @@
   .notion-sidebar-link {
     @apply block py-2 px-3 rounded-md text-gray-800 hover:bg-gray-200 font-medium transition;
   }
+  .notion-sidebar-link-active {
+    @apply bg-gray-200 text-gray-900 font-semibold;
+  }
 }

@@ -121,12 +121,6 @@
 <script setup lang="ts">
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
-import Bold from "@tiptap/starter-kit";
-import Italic from "@tiptap/starter-kit";
-import Heading from "@tiptap/starter-kit";
-import BulletList from "@tiptap/starter-kit";
-import OrderedList from "@tiptap/starter-kit";
-import ListItem from "@tiptap/extension-list-item";
 import Underline from "@tiptap/extension-underline";
 import Image from "@tiptap/extension-image";
 import { useAuthStore } from "~/stores/auth";
@@ -227,13 +221,7 @@ onMounted(() => {
       content: model || "",
       extensions: [
         StarterKit,
-        Bold,
-        Italic,
         Underline,
-        Heading,
-        BulletList,
-        OrderedList,
-        ListItem,
         Image.configure({
           inline: true,
           allowBase64: false,
