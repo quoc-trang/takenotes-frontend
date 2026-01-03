@@ -119,22 +119,22 @@
 </template>
 
 <script setup lang="ts">
-import { Editor, EditorContent } from "@tiptap/vue-3";
-import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
-import Image from "@tiptap/extension-image";
-import { useAuthStore } from "~/stores/auth";
+import { Editor, EditorContent } from '@tiptap/vue-3';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+import Image from '@tiptap/extension-image';
+import { useAuthStore } from '~/stores/auth';
 
-const model = defineModel();
+const noteContent = defineModel();
 
 const authStore = useAuthStore();
 const uploading = ref(false);
 
 // Watch for external content changes
 const editor = ref<Editor>();
-watch(model, (value) => {
+watch(noteContent, (value) => {
   if (editor.value && editor.value.getHTML() !== value) {
-    editor.value.commands.setContent(value || "");
+    editor.value.commands.setContent(value || '');
   }
 });
 
@@ -150,15 +150,15 @@ const onFileSelect = async (event: Event) => {
   if (!file || !editor.value) return;
 
   // Validate file type
-  if (!file.type.startsWith("image/")) {
-    alert("Please select an image file");
+  if (!file.type.startsWith('image/')) {
+    alert('Please select an image file');
     return;
   }
 
   // Validate file size (e.g., max 5MB)
   const maxSize = 5 * 1024 * 1024; // 5MB
   if (file.size > maxSize) {
-    alert("Image size must be less than 5MB");
+    alert('Image size must be less than 5MB');
     return;
   }
 
@@ -166,11 +166,11 @@ const onFileSelect = async (event: Event) => {
 
   try {
     // Step 1: Get signed URL from backend
-    const { signedUrl, filenameInGCS } = await $fetch("/api/upload/image", {
-      method: "POST",
+    const { signedUrl, filenameInGCS } = await $fetch('/api/upload/image', {
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${authStore.token}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: {
         filename: file.name,
@@ -180,19 +180,19 @@ const onFileSelect = async (event: Event) => {
 
     // Step 2: Upload image to GCS using signed URL
     await fetch(signedUrl, {
-      method: "PUT",
+      method: 'PUT',
       headers: {
-        "Content-Type": file.type,
+        'Content-Type': file.type,
       },
       body: file,
     });
 
     // step 3: get the image from gcs to display to user
     const imageUrl: string = await $fetch(`/api/images/${filenameInGCS}`, {
-      method: "GET",
+      method: 'GET',
       headers: {
         Authorization: `Bearer ${authStore.token}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
 
@@ -201,15 +201,15 @@ const onFileSelect = async (event: Event) => {
     // Step 4: Insert image into editor
     editor.value.chain().focus().setImage({ src: imageUrl }).run();
   } catch (error: any) {
-    console.error("Image upload failed:", error);
+    console.error('Image upload failed:', error);
     alert(
-      error.data?.message || error.statusMessage || "Failed to upload image"
+      error.data?.message || error.statusMessage || 'Failed to upload image'
     );
   } finally {
     uploading.value = false;
     // Reset file input
     if (fileInput.value) {
-      fileInput.value.value = "";
+      fileInput.value.value = '';
     }
   }
 };
@@ -218,7 +218,7 @@ const onFileSelect = async (event: Event) => {
 onMounted(() => {
   if (import.meta.client) {
     editor.value = new Editor({
-      content: model || "",
+      content: noteContent || '',
       extensions: [
         StarterKit,
         Underline,
@@ -228,11 +228,11 @@ onMounted(() => {
         }),
       ],
       onUpdate({ editor }) {
-        model.value = editor.getHTML();
+        noteContent.value = editor.getHTML();
       },
       editorProps: {
         attributes: {
-          class: "prose prose-sm max-w-none focus:outline-none",
+          class: 'prose prose-sm max-w-none focus:outline-none',
         },
       },
     });
