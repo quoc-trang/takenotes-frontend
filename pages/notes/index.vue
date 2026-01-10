@@ -85,7 +85,7 @@
     </div>
 
     <!-- Notes Grid -->
-    <div v-else class="grid grid-cols-1 gap-6 cursor-pointer" >
+    <div v-else class="grid grid-cols-1 gap-6 cursor-pointer">
       <div
         v-for="note in notesStore.getNotes"
         :key="note.id"
@@ -140,7 +140,11 @@
 
           <div
             class="mb-4 overflow-hidden transition-[max-height] duration-300 ease-in-out"
-            :style="expandedNotes.has(note.id) ? 'max-height: 800px' : 'max-height: 72px'"
+            :style="
+              expandedNotes.has(note.id)
+                ? 'max-height: 800px'
+                : 'max-height: 72px'
+            "
           >
             <p
               class="text-gray-600 transition-all duration-500"
@@ -272,9 +276,7 @@ const newNote = ref({
 
 // Fetch notes on page load
 onMounted(async () => {
-  if (authStore.isLoggedIn) {
-    await notesStore.fetchNotes();
-  }
+  await notesStore.fetchNotes();
 });
 
 // Create new note
