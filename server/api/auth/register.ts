@@ -1,4 +1,4 @@
-export default eventHandler(async (event) => {
+export default eventHandler(async (event): Promise<any> => {
   try {
     const body = await readBody(event)
     const config = useRuntimeConfig()
