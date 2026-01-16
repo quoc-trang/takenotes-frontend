@@ -5,6 +5,9 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
   ],
   css: ['~/assets/css/main.css'],
+  nitro: {
+    preset: 'node-server',
+  },
   runtimeConfig: {
     public: {
       apiBaseURL: process.env.NUXT_PUBLIC_API_BASE_URL
@@ -23,4 +26,4 @@ export default defineNuxtConfig({
       ]
     }
   }
-}) 
+})

@@ -1,0 +1,42 @@
+name: Deploy Frontend Nuxt to Cloud Run
+
+on:
+  push:
+    branches: [main]
+
+env:
+  GCP_REGION: asia-southeast1
+  REPO_NAME: takenotes-frontend-nuxt-repo
+  IMAGE_NAME: nuxt-frontend
+  SERVICE_NAME: takenotes-frontend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v2"
+        with:
+          workload_identity_provider: "${{ secrets.WIF_PROVIDER }}"
+          service_account: "${{ secrets.WIF_SERVICE_ACCOUNT }}"
+
+      - name: Docker Auth
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and Push
+        run: |-
+          docker build -t ${{ env.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          docker push ${{ env.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Deploy to Cloud Run
+        uses: "google-github-actions/deploy-cloudrun@v2"
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          image: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          region: ${{ env.GCP_REGION }}

@@ -33,7 +33,7 @@ npm install
 
 3. Configure API base URL (optional):
 
-- By default, the frontend expects the backend at `http://localhost:3001`.
+- By default, the frontend expects the backend at `http://localhost:8080`.
 - To change, set the `API_BASE` environment variable or edit `nuxt.config.ts`.
 
 4. Start the development server:
