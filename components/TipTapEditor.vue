@@ -1,5 +1,20 @@
 <template>
   <div class="border rounded-lg bg-white">
+
+    <template v-if="temporaryImageUrl" class="border-b p-3 bg-gray-50">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm text-gray-600 font-medium">Image uploaded</span>
+      </div>
+      <div class="rounded-lg overflow-hidden max-h-48">
+        <img
+          :src="temporaryImageUrl"
+          alt="Uploaded image preview"
+          class="w-full h-auto object-contain max-h-48"
+        />
+      </div>
+    </template>
+
+
     <!-- Toolbar -->
     <template v-if="editor">
       <div class="border-b p-2 flex flex-wrap gap-1">
@@ -119,22 +134,21 @@
 </template>
 
 <script setup lang="ts">
-import { Editor, EditorContent } from '@tiptap/vue-3';
-import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
-import Image from '@tiptap/extension-image';
-import { useAuthStore } from '~/stores/auth';
+import { Editor, EditorContent } from "@tiptap/vue-3";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import Image from "@tiptap/extension-image";
 
 const noteContent = defineModel();
-
-const authStore = useAuthStore();
+const filenameToSave = defineModel("imageUrl");
 const uploading = ref(false);
+const temporaryImageUrl = ref('')
 
 // Watch for external content changes
 const editor = ref<Editor>();
 watch(noteContent, (value) => {
   if (editor.value && editor.value.getHTML() !== value) {
-    editor.value.commands.setContent(value || '');
+    editor.value.commands.setContent(value || "");
   }
 });
 
@@ -150,15 +164,15 @@ const onFileSelect = async (event: Event) => {
   if (!file || !editor.value) return;
 
   // Validate file type
-  if (!file.type.startsWith('image/')) {
-    alert('Please select an image file');
+  if (!file.type.startsWith("image/")) {
+    alert("Please select an image file");
     return;
   }
 
   // Validate file size (e.g., max 5MB)
   const maxSize = 5 * 1024 * 1024; // 5MB
   if (file.size > maxSize) {
-    alert('Image size must be less than 5MB');
+    alert("Image size must be less than 5MB");
     return;
   }
 
@@ -166,50 +180,41 @@ const onFileSelect = async (event: Event) => {
 
   try {
     // Step 1: Get signed URL from backend
-    const { signedUrl, filenameInGCS } = await $fetch('/api/upload/image', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${authStore.token}`,
-        'Content-Type': 'application/json',
-      },
+    const { signedUrl, filenameInGCS } = await $fetch("/api/upload/image", {
+      method: "POST",
       body: {
         filename: file.name,
         contentType: file.type,
       },
     });
 
+    filenameToSave.value = filenameInGCS;
+
     // Step 2: Upload image to GCS using signed URL
     await fetch(signedUrl, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': file.type,
+        "Content-Type": file.type,
       },
       body: file,
     });
 
     // step 3: get the image from gcs to display to user
-    const imageUrl: string = await $fetch(`/api/images/${filenameInGCS}`, {
+    temporaryImageUrl.value = await $fetch(`/api/images/${filenameInGCS}`, {
       method: 'GET',
-      headers: {
-        Authorization: `Bearer ${authStore.token}`,
-        'Content-Type': 'application/json',
-      },
     });
 
-    console.log(imageUrl);
 
-    // Step 4: Insert image into editor
-    editor.value.chain().focus().setImage({ src: imageUrl }).run();
   } catch (error: any) {
-    console.error('Image upload failed:', error);
+    console.error("Image upload failed:", error);
     alert(
-      error.data?.message || error.statusMessage || 'Failed to upload image'
+      error.data?.message || error.statusMessage || "Failed to upload image"
     );
   } finally {
     uploading.value = false;
     // Reset file input
     if (fileInput.value) {
-      fileInput.value.value = '';
+      fileInput.value.value = "";
     }
   }
 };
@@ -218,7 +223,7 @@ const onFileSelect = async (event: Event) => {
 onMounted(() => {
   if (import.meta.client) {
     editor.value = new Editor({
-      content: noteContent || '',
+      content: noteContent || "",
       extensions: [
         StarterKit,
         Underline,
@@ -232,7 +237,7 @@ onMounted(() => {
       },
       editorProps: {
         attributes: {
-          class: 'prose prose-sm max-w-none focus:outline-none',
+          class: "prose prose-sm max-w-none focus:outline-none",
         },
       },
     });

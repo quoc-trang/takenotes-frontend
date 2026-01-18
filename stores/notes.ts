@@ -6,6 +6,7 @@ interface Note {
   content: string
   createdAt: string
   updatedAt: string
+  imageUrl?: string
 }
 
 export const useNotesStore = defineStore('notes', () => {
@@ -30,7 +31,7 @@ export const useNotesStore = defineStore('notes', () => {
     }
   }
 
-  const createNote = async (note: { title: string; content: string }) => {
+  const createNote = async (note: { title: string; content: string, imageUrl?: string }) => {
     try {
       const newNote = await $fetch('/api/notes', {
         method: 'POST',

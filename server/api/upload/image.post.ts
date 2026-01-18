@@ -3,7 +3,7 @@ export default eventHandler(async (event): Promise<any> => {
         const config = useRuntimeConfig()
         const apiBaseURL = config.public.apiBaseURL
 
-        const token = getHeader(event, 'authorization');
+        const token = getCookie(event, 'token');
 
         const body = await readBody(event)
         const {filename, contentType} = body
@@ -24,6 +24,6 @@ export default eventHandler(async (event): Promise<any> => {
         return { signedUrl, filenameInGCS}
         
     } catch (error) {
-        
+        console.log(error)
     }
 })

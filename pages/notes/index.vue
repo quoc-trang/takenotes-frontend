@@ -92,6 +92,9 @@
         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-200"
       >
         <div class="p-6" @click="toggleNote(note.id)">
+          <template v-if="note.imageUrl">
+            <img :src="getImageUrl(note.imageUrl)" :alt="note.title" class="w-full h-64 object-cover">
+          </template>
           <div class="flex justify-between items-start mb-4">
             <h3 class="text-xl font-semibold text-gray-900 line-clamp-2">
               {{ note.title }}
@@ -323,6 +326,11 @@ const formatDate = (dateString: string) => {
     day: "numeric",
   });
 };
+
+const getImageUrl = (imageUrl?: string) => {
+  if(!imageUrl) return 
+  return `https://storage.googleapis.com/takenotes-uploads-assets/${imageUrl}`;
+}
 </script>
 
 <style scoped>

@@ -3,6 +3,13 @@
     <div class="card">
       <div v-if="note">
         <h1 class="text-2xl font-bold mb-2">{{ note.title }}</h1>
+        <template v-if="note.imageUrl">
+          <img
+            :src="getImageUrl(note.imageUrl)"
+            :alt="note.title"
+            class="w-full h-auto object-cover"
+          />
+        </template>
         <div class="prose prose-blue max-w-none mb-6" v-html="note.content"></div>
         <div class="flex justify-between items-center">
           <div class="text-xs text-gray-500">
@@ -57,4 +64,9 @@ const formatDate = (dateStr: string) => {
   const date = new Date(dateStr)
   return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
+
+const getImageUrl = (imageUrl?: string) => {
+  if (!imageUrl) return
+  return `https://storage.googleapis.com/takenotes-uploads-assets/${imageUrl}`;
+};
 </script> 

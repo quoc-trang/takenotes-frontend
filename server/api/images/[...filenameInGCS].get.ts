@@ -2,7 +2,7 @@ export default eventHandler(async (event): Promise<any> => {
     const config = useRuntimeConfig()
     const apiBaseURL = config.public.apiBaseURL
     const filenameInGCS = getRouterParam(event, 'filenameInGCS')
-    const token = getHeader(event, 'authorization')
+    const token = getCookie(event, 'token')
 
     try {
         const { imageUrl } = await $fetch<{imageUrl: string}>(`${apiBaseURL}/api/upload/image`, {

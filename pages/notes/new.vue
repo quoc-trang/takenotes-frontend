@@ -21,7 +21,7 @@
           <label class="block text-sm font-medium text-gray-700 mb-1">
             Content
           </label>
-          <TipTapEditor v-model="form.content" />
+          <TipTapEditor v-model="form.content" v-model:image-url="imageUrl" />
         </div>
         <div v-if="error" class="text-red-600 text-sm">
           {{ error }}
@@ -47,6 +47,7 @@ const form = ref({
   title: '',
   content: ''
 })
+const imageUrl = ref('')
 
 const loading = ref(false)
 const error = ref('')
@@ -55,7 +56,7 @@ const handleCreate = async () => {
   loading.value = true
   error.value = ''
   try {
-    await notesStore.createNote(form.value)
+    await notesStore.createNote({...form.value, imageUrl: imageUrl.value})
     return navigateTo('/notes')
   } catch (err: any) {
     error.value = err.message || 'Failed to create note'
