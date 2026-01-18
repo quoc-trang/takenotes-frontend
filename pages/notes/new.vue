@@ -42,7 +42,6 @@
 import { useNotesStore } from '@/stores/notes'
 
 const notesStore = useNotesStore()
-const router = useRouter()
 
 const form = ref({
   title: '',
@@ -57,7 +56,7 @@ const handleCreate = async () => {
   error.value = ''
   try {
     await notesStore.createNote(form.value)
-    router.push('/notes')
+    return navigateTo('/notes')
   } catch (err: any) {
     error.value = err.message || 'Failed to create note'
   } finally {

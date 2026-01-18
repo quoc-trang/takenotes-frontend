@@ -25,10 +25,7 @@ const TOKEN_COOKIE_OPTIONS = {
 export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = useCookie(TOKEN_COOKIE_NAME, TOKEN_COOKIE_OPTIONS)
 
-  const user = useState('auth-user', () => null)
-
   return {
     isLoggedIn
   }
-
 })

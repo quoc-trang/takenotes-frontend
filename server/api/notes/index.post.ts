@@ -1,21 +1,14 @@
 export default eventHandler(async (event): Promise<any> => {
   try {
     const config = useRuntimeConfig()
-    const apiBaseURL = config.public.apiBaseURL || 'http://localhost:8080'
-    const authHeader = getHeader(event, 'authorization')
+    const apiBaseURL = config.public.apiBaseURL
     const body = await readBody(event)
 
-    if (!authHeader) {
+    const token = getCookie(event, 'token')
+    if (!token) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Authorization header required'
-      })
-    }
-
-    if (!body.title || !body.content) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Title and content are required'
+        statusMessage: 'Unauthorized: No token provided'
       })
     }
 
@@ -24,15 +17,13 @@ export default eventHandler(async (event): Promise<any> => {
     const response = await $fetch(`${apiBaseURL}/api/notes`, {
       method: 'POST',
       headers: {
-        'Authorization': authHeader,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
       body
     })
 
-    console.log(`[API] Note created successfully`)
     return response
-
   } catch (error: any) {
     console.error(`[API] Create note failed:`, error)
 

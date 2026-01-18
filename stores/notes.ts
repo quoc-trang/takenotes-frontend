@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { useAuthStore } from './auth'
 
 interface Note {
   id: string
@@ -32,16 +31,9 @@ export const useNotesStore = defineStore('notes', () => {
   }
 
   const createNote = async (note: { title: string; content: string }) => {
-    const authStore = useAuthStore()
-    if (!authStore.token) return
-    
     try {
       const newNote = await $fetch('/api/notes', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`,
-          'Content-Type': 'application/json'
-        },
         body: note
       })
       notes.value.unshift(newNote)
@@ -52,19 +44,12 @@ export const useNotesStore = defineStore('notes', () => {
   }
 
   const updateNote = async (id: string, note: { title: string; content: string }) => {
-    const authStore = useAuthStore()
-    if (!authStore.token) return
-    
     try {
       const updatedNote = await $fetch(`/api/notes/${id}`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`,
-          'Content-Type': 'application/json'
-        },
         body: note
       })
-      
+
       const index = notes.value.findIndex(n => n.id === id)
       if (index !== -1) {
         notes.value[index] = updatedNote
@@ -76,17 +61,11 @@ export const useNotesStore = defineStore('notes', () => {
   }
 
   const deleteNote = async (id: string) => {
-    const authStore = useAuthStore()
-    if (!authStore.token) return
-    
     try {
       await $fetch(`/api/notes/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`
-        }
       })
-      
+
       notes.value = notes.value.filter(note => note.id !== id)
     } catch (err: any) {
       throw new Error(err.data?.message || err.statusMessage || 'Failed to delete note')
@@ -98,12 +77,12 @@ export const useNotesStore = defineStore('notes', () => {
     notes,
     loading,
     error,
-    
+
     // Getters
     getNotes,
     getNoteById,
     isLoading,
-    
+
     // Actions
     fetchNotes,
     createNote,

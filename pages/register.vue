@@ -82,13 +82,9 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from "~/stores/auth";
-
 definePageMeta({
   layout: false,
 });
-
-const authStore = useAuthStore();
 
 const form = ref({
   email: "",
@@ -116,7 +112,7 @@ const handleRegister = async () => {
   error.value = "";
 
   try {
-    const response = await $fetch("/api/auth/register", {
+    await $fetch("/api/auth/register", {
       method: "POST",
       body: {
         email: form.value.email,
@@ -124,7 +120,6 @@ const handleRegister = async () => {
       },
     });
 
-    authStore.setAuth(response.user);
     return navigateTo("/notes");
   } catch (err: any) {
     error.value = err.data?.message || "Registration failed";

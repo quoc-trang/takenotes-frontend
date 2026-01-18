@@ -1,15 +1,15 @@
 export default eventHandler(async (event): Promise<any> => {
   try {
     const config = useRuntimeConfig()
-    const apiBaseURL = config.public.apiBaseURL || 'http://localhost:8080'
-    const authHeader = getHeader(event, 'authorization')
-    const method = getMethod(event)
+    const apiBaseURL = config.public.apiBaseURL
+    const token = getCookie(event, 'token')
+    const method = event.method
     const id = getRouterParam(event, 'id')
 
-    if (!authHeader) {
+    if (!token) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Authorization header required'
+        statusMessage: 'Unauthorized: No token provided'
       })
     }
 
@@ -25,7 +25,7 @@ export default eventHandler(async (event): Promise<any> => {
     const options: any = {
       method,
       headers: {
-        'Authorization': authHeader,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     }
@@ -40,7 +40,6 @@ export default eventHandler(async (event): Promise<any> => {
 
     console.log(`[API] ${method} note ${id} successful`)
     return response
-
   } catch (error: any) {
     console.error(`[API] Note operation failed:`, error)
 

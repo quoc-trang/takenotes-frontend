@@ -15,8 +15,26 @@ export default eventHandler(async (event): Promise<any> => {
     })
 
     console.log(`[API] Registration successful for email: ${body.email}`)
-    return response
 
+    const token = response.token
+
+    setCookie(event, 'token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/'
+    })
+
+    setCookie(event, 'is-loggedIn', 'true', {
+      httpOnly: false,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/'
+    })
+
+    return { user: response.user }
   } catch (error: any) {
     console.error(`[API] Registration failed:`, error)
 

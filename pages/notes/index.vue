@@ -158,7 +158,7 @@
             <button
               class="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition-colors"
             >
-              {{ expandedNotes.has(note.id) ? 'Show less' : 'Show more' }}
+              {{ expandedNotes.has(note.id) ? "Show less" : "Show more" }}
               <svg
                 class="w-4 h-4 transition-transform duration-300"
                 :class="{ 'rotate-180': expandedNotes.has(note.id) }"
@@ -235,7 +235,7 @@
               :disabled="creating"
               class="btn-primary flex-1 disabled:opacity-50"
             >
-              {{ creating ? 'Creating...' : 'Create Note' }}
+              {{ creating ? "Creating..." : "Create Note" }}
             </button>
           </div>
         </form>
@@ -245,12 +245,9 @@
 </template>
 
 <script setup lang="ts">
-import { useNotesStore } from '@/stores/notes';
-import { useAuthStore } from '@/stores/auth';
+import { useNotesStore } from "@/stores/notes";
 
 const notesStore = useNotesStore();
-const authStore = useAuthStore();
-const router = useRouter();
 
 // Modal state
 const showCreateModal = ref(false);
@@ -270,8 +267,8 @@ const toggleNote = (noteId: string) => {
 
 // New note form
 const newNote = ref({
-  title: '',
-  content: '',
+  title: "",
+  content: "",
 });
 
 // Fetch notes on page load
@@ -291,11 +288,11 @@ const createNote = async () => {
     });
 
     // Reset form and close modal
-    newNote.value = { title: '', content: '' };
+    newNote.value = { title: "", content: "" };
     showCreateModal.value = false;
   } catch (error: any) {
-    console.error('Failed to create note:', error);
-    alert(error.message || 'Failed to create note');
+    console.error("Failed to create note:", error);
+    alert(error.message || "Failed to create note");
   } finally {
     creating.value = false;
   }
@@ -303,27 +300,27 @@ const createNote = async () => {
 
 // Edit note
 const editNote = (note: any) => {
-  router.push(`/notes/${note.id}/edit`);
+  return navigateTo(`/notes/${note.id}/edit`);
 };
 
 // Delete note
 const deleteNote = async (id: string) => {
-  if (!confirm('Are you sure you want to delete this note?')) return;
+  if (!confirm("Are you sure you want to delete this note?")) return;
 
   try {
     await notesStore.deleteNote(id);
   } catch (error: any) {
-    console.error('Failed to delete note:', error);
-    alert(error.message || 'Failed to delete note');
+    console.error("Failed to delete note:", error);
+    alert(error.message || "Failed to delete note");
   }
 };
 
 // Format date
 const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 };
 </script>
