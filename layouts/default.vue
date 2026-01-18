@@ -34,7 +34,7 @@
     <div class="flex flex-col min-h-screen flex-1 overflow-y-scroll">
       <main class="flex-1 flex flex-col items-center bg-white">
         <div class="w-full px-4 py-10">
-          <slot />
+          <NuxtPage />
         </div>
       </main>
     </div>
