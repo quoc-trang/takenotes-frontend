@@ -19,18 +19,10 @@ export const useNotesStore = defineStore('notes', () => {
   const isLoading = computed(() => loading.value)
 
   const fetchNotes = async () => {
-    const authStore = useAuthStore()
-    if (!authStore.token) return
-    
     loading.value = true
     error.value = null
-    
     try {
-      const response = await $fetch('/api/notes', {
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`
-        }
-      })
+      const response = await $fetch('/api/notes')
       notes.value = response
     } catch (err: any) {
       error.value = err.data?.message || err.statusMessage || 'Failed to fetch notes'

@@ -1,5 +1,4 @@
-import { defineStore } from 'pinia'
-import { jwtDecode } from 'jwt-decode'
+import { jwtDecode } from "jwt-decode"
 
 interface User {
   id: string
@@ -7,71 +6,29 @@ interface User {
   createdAt: string
 }
 
-interface JWTPayload {
+interface JWTPayLoad {
   id: string
   email: string
   exp: number
   iat: number
 }
 
+const TOKEN_COOKIE_NAME = 'is-loggedIn'
+const TOKEN_COOKIE_OPTIONS = {
+  httpOnly: false, // disable client side reading cookie
+  secure: true, // only sent over https
+  sameSite: 'lax' as const,
+  maxAge: 60 * 60 * 24 * 7, // 7 days
+  path: '/'
+}
+
 export const useAuthStore = defineStore('auth', () => {
-  const token = ref<string | null>(null)
+  const isLoggedIn = useCookie(TOKEN_COOKIE_NAME, TOKEN_COOKIE_OPTIONS)
 
-  const decodedToken = computed<JWTPayload | null>(() => {
-    if (!token.value) return null
-    try {
-      return jwtDecode<JWTPayload>(token.value)
-    } catch {
-      return null
-    }
-  })
-
-  const user = computed<User | null>(() => {
-    const decoded = decodedToken.value
-    if (!decoded) return null
-    return {
-      id: decoded.id,
-      email: decoded.email,
-      createdAt: new Date(decoded.iat * 1000).toISOString(),
-    }
-  })
-
-  const isLoggedIn = computed(() => {
-    const decoded = decodedToken.value
-    if (!decoded) return false
-    return decoded.exp > Date.now() / 1000
-  })
-
-  const isTokenExpired = computed(() => !isLoggedIn.value)
-
-  const getTokenExpiration = computed(() => {
-    const decoded = decodedToken.value
-    if (!decoded) return null
-    return new Date(decoded.exp * 1000)
-  })
-
-  const setAuth = (newToken: string) => {
-    token.value = newToken
-  }
-
-  const logout = () => {
-    token.value = null
-  }
+  const user = useState('auth-user', () => null)
 
   return {
-    // State
-    token,
-
-    // Computed
-    user,
-    isLoggedIn,
-    isTokenExpired,
-    getTokenExpiration,
-
-    // Actions
-    setAuth,
-    logout,
+    isLoggedIn
   }
-}, {
-  persist: true
+
 })

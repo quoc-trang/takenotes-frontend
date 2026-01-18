@@ -64,14 +64,10 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from "@/stores/auth";
-
 definePageMeta({
   layout: false,
 });
 
-const authStore = useAuthStore();
-const router = useRouter();
 const logger = useLogger();
 
 const form = ref({
@@ -90,7 +86,7 @@ const handleLogin = async () => {
 
   try {
     const startTime = Date.now();
-    const response = await $fetch("/api/auth/login", {
+    await $fetch("/api/auth/login", {
       method: "POST",
       body: form.value,
     });
@@ -100,11 +96,7 @@ const handleLogin = async () => {
     logger.apiCall("POST", "/api/auth/login", 200, duration);
     logger.userAction("Login successful", { email: form.value.email });
 
-    // Store authentication data
-    authStore.setAuth(response.token);
-
-    // Navigate to notes page
-    await router.push("/notes");
+    await navigateTo("/notes");
   } catch (err: any) {
     logger.error("Login failed", err);
     error.value = err.data?.message || err.statusMessage || "Login failed";

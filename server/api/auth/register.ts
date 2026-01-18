@@ -2,7 +2,7 @@ export default eventHandler(async (event): Promise<any> => {
   try {
     const body = await readBody(event)
     const config = useRuntimeConfig()
-    const apiBaseURL = config.public.apiBaseURL || 'http://localhost:8080'
+    const apiBaseURL = config.public.apiBaseURL
 
     console.log(`[API] Registration attempt for email: ${body.email}`)
 

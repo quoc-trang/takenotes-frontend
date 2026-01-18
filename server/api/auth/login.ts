@@ -9,9 +9,7 @@ export default eventHandler(async (event): Promise<any> => {
   try {
     const body = await readBody(event)
     const config = useRuntimeConfig()
-    const apiBaseURL = config.public.apiBaseURL || 'http://localhost:8080'
-
-    console.log(`[API] Login attempt for email: ${body.email}`)
+    const apiBaseURL = config.public.apiBaseURL
 
     const response = await $fetch(`${apiBaseURL}/api/auth/login`, {
       method: 'POST',
@@ -21,10 +19,25 @@ export default eventHandler(async (event): Promise<any> => {
       }
     })
 
-    console.log(`[API] Login successful for email: ${body.email}`)
+    const token = response.token
 
-    return response
+    setCookie(event, 'token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/'
+    })
 
+    setCookie(event, 'is-loggedIn', 'true', {
+      httpOnly: false,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/'
+    })
+
+    return { user: response.user }
   } catch (error) {
     const apiError = error as ApiError
     console.error(`[API] Login failed:`, error)

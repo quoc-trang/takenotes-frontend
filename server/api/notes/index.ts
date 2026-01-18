@@ -1,12 +1,13 @@
 export default eventHandler(async (event): Promise<any> => {
   try {
     const config = useRuntimeConfig()
-    const apiBaseURL = config.public.apiBaseURL || 'http://localhost:8080'
-    const authHeader = getHeader(event, 'authorization')
-    if (!authHeader) {
+    const apiBaseURL = config.public.apiBaseURL
+    const token = getCookie(event, 'token')
+
+    if (!token) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Authorization header required'
+        statusMessage: 'Unauthorized: No token provided'
       })
     }
 
@@ -15,14 +16,11 @@ export default eventHandler(async (event): Promise<any> => {
     const response = await $fetch(`${apiBaseURL}/api/notes`, {
       method: 'GET',
       headers: {
-        'Authorization': authHeader,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     })
-
-    console.log(`[API] Notes fetched successfully`)
     return response
-
   } catch (error: any) {
     console.error(`[API] Fetch notes failed:`, error)
 

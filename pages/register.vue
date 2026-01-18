@@ -89,7 +89,6 @@ definePageMeta({
 });
 
 const authStore = useAuthStore();
-const router = useRouter();
 
 const form = ref({
   email: "",
@@ -118,7 +117,6 @@ const handleRegister = async () => {
 
   try {
     const response = await $fetch("/api/auth/register", {
-      baseURL: useRuntimeConfig().public.apiBase,
       method: "POST",
       body: {
         email: form.value.email,
@@ -126,8 +124,8 @@ const handleRegister = async () => {
       },
     });
 
-    authStore.setAuth(response.user, response.token);
-    router.push("/notes");
+    authStore.setAuth(response.user);
+    return navigateTo("/notes");
   } catch (err: any) {
     error.value = err.data?.message || "Registration failed";
   } finally {
