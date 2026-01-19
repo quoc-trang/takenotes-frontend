@@ -43,3 +43,10 @@ docs/.vuepress/.cache
 
 # Dependencies
 node_modules/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright-artifacts/
+.features-gen/

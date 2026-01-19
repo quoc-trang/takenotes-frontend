@@ -142,7 +142,7 @@ import Image from "@tiptap/extension-image";
 const noteContent = defineModel();
 const filenameToSave = defineModel("imageUrl");
 const uploading = ref(false);
-const temporaryImageUrl = ref('')
+const temporaryImageUrl = ref("");
 
 // Watch for external content changes
 const editor = ref<Editor>();
@@ -201,14 +201,12 @@ const onFileSelect = async (event: Event) => {
 
     // step 3: get the image from gcs to display to user
     temporaryImageUrl.value = await $fetch(`/api/images/${filenameInGCS}`, {
-      method: 'GET',
+      method: "GET",
     });
-
-
   } catch (error: any) {
     console.error("Image upload failed:", error);
     alert(
-      error.data?.message || error.statusMessage || "Failed to upload image"
+      error.data?.message || error.statusMessage || "Failed to upload image",
     );
   } finally {
     uploading.value = false;
@@ -245,6 +243,10 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  if (temporaryImageUrl.value) {
+    temporaryImageUrl.value = "";
+  }
+
   if (editor.value) {
     editor.value.destroy();
   }
